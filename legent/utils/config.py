@@ -15,3 +15,7 @@ TASKS_FOLDER = f"{resource_path}/tasks"
 DATASET_FOLDER = f"{resource_path}/dataset"
 MODEL_FOLDER = f"{resource_path}/models"
 EVAL_FOLDER = f"{resource_path}/eval"
+
+# OpenAI
+OPENAI_API_KEY = ""
+OPENAI_BASE_URL = ""

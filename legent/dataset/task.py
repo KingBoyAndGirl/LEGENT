@@ -1,18 +1,20 @@
+import os
+import random
+import re
+import time
+from typing import Literal
+
+import numpy as np
 import openai
-from legent.server.scene_generator import generate_scene, generate_scene_messy, prefabs
-from legent.utils.config import TASKS_FOLDER
+
+from legent.server.scene_generator import generate_scene, prefabs
+from legent.utils.config import TASKS_FOLDER, OPENAI_API_KEY, OPENAI_BASE_URL
 from legent.utils.io import store_json, load_json_from_toolkit, time_string, scene_string, log_green, log
 from legent.utils.math import is_point_on_box
-import time
-import os
-from typing import Literal
-import random
-import numpy as np
-import re
 
 
 class ChatBase:
-    def __init__(self, api_key=None, base_url=None) -> None:
+    def __init__(self, api_key=OPENAI_API_KEY, base_url=OPENAI_BASE_URL) -> None:
         if api_key:
             self.client = openai.OpenAI(api_key=api_key, base_url=base_url)
 
