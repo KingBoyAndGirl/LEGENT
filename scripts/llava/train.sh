@@ -22,7 +22,7 @@ fi
 # train and save the model
 # See legent/model/llava/model/llava_arch.py
 # If mm_vision_tower exists in config.json, vision_tower will not be used. Here vision_tower is not used.
-deepspeed --include=localhost:0,1 scripts/llava/train.py \
+deepspeed --include=localhost:0 scripts/llava/train.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed scripts/llava/zero3.json \
     --model_name_or_path $MODEL_BASE \
@@ -36,7 +36,7 @@ deepspeed --include=localhost:0,1 scripts/llava/train.py \
     --mm_use_im_patch_token False \
     --image_aspect_ratio pad \
     --group_by_modality_length True \
-    --bf16 True \
+    --fp16 True \
     --output_dir $OUTPUT_DIR \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
@@ -51,7 +51,7 @@ deepspeed --include=localhost:0,1 scripts/llava/train.py \
     --warmup_ratio 0.03 \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
-    --tf32 True \
+    --tf32 False \
     --model_max_length 2048 \
     --gradient_checkpointing True \
     --dataloader_num_workers 4 \
