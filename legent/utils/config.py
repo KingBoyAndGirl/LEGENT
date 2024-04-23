@@ -17,5 +17,5 @@ MODEL_FOLDER = f"{resource_path}/models"
 EVAL_FOLDER = f"{resource_path}/eval"
 
 # OpenAI
-OPENAI_API_KEY = ""
-OPENAI_BASE_URL = ""
+OPENAI_API_KEY = None
+OPENAI_BASE_URL = None
