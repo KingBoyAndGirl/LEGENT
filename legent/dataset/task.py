@@ -8,7 +8,7 @@ import numpy as np
 import openai
 
 from legent.server.scene_generator import generate_scene, prefabs
-from legent.utils.config import TASKS_FOLDER, OPENAI_API_KEY, OPENAI_BASE_URL
+from legent.utils.config import TASKS_FOLDER, OPENAI_API_KEY, OPENAI_BASE_URL, MODEL_CHAT
 from legent.utils.io import store_json, load_json_from_toolkit, time_string, scene_string, log_green, log
 from legent.utils.math import is_point_on_box
 
@@ -20,7 +20,7 @@ class ChatBase:
 
     def send_chat(self, messages):
         response = self.client.chat.completions.create(
-            model='gpt-4',  # 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k'
+            model=MODEL_CHAT,  # 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k'
             messages=messages,
             max_tokens=None,
             n=1,

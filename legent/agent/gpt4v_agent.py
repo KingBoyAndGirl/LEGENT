@@ -6,7 +6,7 @@ from PIL import Image
 from typing import List
 import numpy as np
 from legent.action.action import parse_action, Action
-from legent.utils.config import OPENAI_BASE_URL, OPENAI_API_KEY
+from legent.utils.config import OPENAI_BASE_URL, OPENAI_API_KEY, MODEL_VISION_PREVIEW
 from legent.utils.io import log
 
 
@@ -60,7 +60,7 @@ class GPT4VAgentClient(AgentClient):
 
     def send_chat(self, messages):
         response = self.client.chat.completions.create(
-            model='gpt-4-vision-preview',
+            model=MODEL_VISION_PREVIEW,
             messages=messages,
             max_tokens=50,
             n=1,

@@ -17,5 +17,7 @@ MODEL_FOLDER = f"{resource_path}/models"
 EVAL_FOLDER = f"{resource_path}/eval"
 
 # OpenAI
-OPENAI_API_KEY = None
+OPENAI_API_KEY = 'None'
 OPENAI_BASE_URL = None
+MODEL_CHAT = 'gpt-4',  # 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k'
+MODEL_VISION_PREVIEW = 'gpt-4-vision-preview'
