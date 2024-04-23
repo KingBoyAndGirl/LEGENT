@@ -13,17 +13,41 @@ def generate_tasks():
             "plan": ["Go to the Pumpkin."]
         }
         scene = generate_scene({"LowPolyInterior_Pumpkin": 1}) # Ensure that the generated scene contains a pumpkin.
-        object_id = {instance['prefab']: i for i, instance in enumerate(scene['instances'])}['LowPolyInterior_Pumpkin']
+        object_id = get_pumpkin_object_index(scene)
         task['solution'] = [f"goto({object_id})"]
         task['scene'] = scene
 
         tasks.append(task)
     return tasks
 
+
+# Get the index of the Pumpkin object in the scene
+def get_pumpkin_object_index(scene):
+    instances = scene['instances']
+    pumpkin_index = None
+
+    for i, instance in enumerate(instances):
+        if instance['prefab'] == 'LowPolyInterior_Pumpkin':
+            pumpkin_index = i
+            break
+
+    if pumpkin_index is not None:
+        object_id = pumpkin_index
+    else:
+        # Pumpkin object not found in the scene.
+        raise ValueError(f'Warning: Pumpkin object not found in the scene.')
+
+    return object_id
+
+
 try:
     saver = TrajectorySaver()
     tasks = generate_tasks()
     for task in tasks:
+        # 如果未找到 Pumpkin 实例，跳过该任务
+        if task['solution'] is None:
+            continue
+
         env.reset(ResetInfo(scene=task['scene']))
         controller = Controller(env, task['solution'])
         traj = controller.collect_trajectory(task)
