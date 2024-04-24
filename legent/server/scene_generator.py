@@ -1,3 +1,5 @@
+import random
+
 from legent.environment.env_utils import get_default_env_data_path
 from legent.scene_generation.objects import get_default_object_db
 from legent.server.rect_placer import RectPlacer
@@ -8,14 +10,13 @@ import json
 from typing import Dict, Literal, Optional
 
 from legent.scene_generation.generator import HouseGenerator
-from legent.scene_generation.objects import DEFAULT_OBJECT_DB,get_default_object_db
+from legent.scene_generation.objects import DEFAULT_OBJECT_DB, get_default_object_db
 from legent.scene_generation.room_spec import (
     ROOM_SPEC_SAMPLER,
     RoomSpecSampler,
     RoomSpec,
     LeafRoom,
 )
-
 
 prefabs = None  # all the prefabs info, including name, size and center offset (for Unity transform position)
 interactable_names = []  # all the interactive object names, such as "Watermelon_01"
@@ -46,8 +47,30 @@ def load_prefabs() -> None:
     kinematic_names_set = set(kinematic_names)
 
 
+def create_room_spec_sampler(room_list, room_num=0):
+    # 如果数组长度小于room_num，则直接使用全部元素
+    if len(room_list) <= room_num:
+        selected_rooms = room_list
+    else:
+        # 从数组中随机选择room_num个不同的元素
+        random.shuffle(room_list)
+        selected_rooms = room_list[:room_num]
+
+    room_ids = [room_list.index(room) + 2 for room in selected_rooms]
+
+    sampler = RoomSpecSampler([
+        RoomSpec(
+            room_spec_id=f"{room_num}Rooms",  # 设置一个标识符，表示room_num个不同的房间
+            sampling_weight=1,
+            spec=[LeafRoom(room_id=room_ids[i], ratio=1, room_type=selected_rooms[i]) for i in range(room_num)],
+        )
+    ])
+
+    return sampler
+
+
 def generate_scene(
-    object_counts: Dict[str, int] = {}, receptacle_object_counts={}, room_num=None, method="proc"
+        object_counts: Dict[str, int] = {}, receptacle_object_counts={}, room_num=None, method="proc"
 ):
     if method == "proc":
         # object_counts specifies a definite number for certain objects
@@ -55,32 +78,12 @@ def generate_scene(
         # global prefabs, interactable_names, kinematic_names, interactable_names_set, kinematic_names_set
         MAX = 7
         sampler = ROOM_SPEC_SAMPLER
-        if room_num == 2:
-            sampler = RoomSpecSampler(
-                [
-                    RoomSpec(
-                        room_spec_id="LivingRoom",  # TwoRooms
-                        sampling_weight=1,
-                        spec=[
-                            LeafRoom(room_id=2, ratio=1, room_type="Bedroom"),
-                            LeafRoom(room_id=3, ratio=1, room_type="LivingRoom"),
-                        ],
-                    )
-                ]
-            )
-        elif room_num == 1:
-            sampler = RoomSpecSampler(
-                [
-                    RoomSpec(
-                        room_spec_id="LivingRoom",
-                        sampling_weight=1,
-                        spec=[LeafRoom(room_id=2, ratio=1, room_type="Bedroom")],
-                    )
-                ]
-            )
+        if room_num in [1, 2]:
+            rooms_list = ["Kitchen", "LivingRoom", "Bedroom", "Bathroom"]
+            sampler = create_room_spec_sampler(rooms_list, room_num)
+
         # receptacle_object_counts= {"Table": {"count": 1, "objects": [{"Banana": 1}]}}
         room_spec = sampler.sample()
-
 
         house_generator = HouseGenerator(
             room_spec=room_spec, dims=(MAX, MAX), objectDB=get_default_object_db()
@@ -127,7 +130,7 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
         np.random.randint(0, MID + 1),
     )
     x0, x1, z0, z1 = MID - top, MID + down, MID - left, MID + right
-    floors[x0 : x1 + 1, z0 : z1 + 1] = 1
+    floors[x0: x1 + 1, z0: z1 + 1] = 1
     area0_range = (
         (x0 - MID) * 2.5 - 1.25,
         (x1 - MID) * 2.5 + 1.25,
@@ -144,7 +147,7 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
     )
     x1, z1 = np.random.randint(0, MAX), np.random.randint(0, MAX)
     x0, x1, z0, z1 = min(x0, x1), max(x0, x1), min(z0, z1), max(z0, z1)
-    floors[x0 : x1 + 1, z0 : z1 + 1] = 2
+    floors[x0: x1 + 1, z0: z1 + 1] = 2
     area1_range = (
         (x0 - MID) * 2.5 - 1.25,
         (x1 - MID) * 2.5 + 1.25,
@@ -263,7 +266,7 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
         )
 
     def random_xz_in_area_inner(
-        eps,
+            eps,
     ):  # To prevent being positioned in the wall and getting pushed out by collision detection.
         area0_range_inner = (
             area0_range[0] + eps,
@@ -340,11 +343,11 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
     }  # Limit the maximum number of each type of object.
 
     def put_once(
-        _name,
-        _placer: RectPlacer,
-        parent_idx,
-        rand_method: Literal["eps", "fit"],
-        return_bbox=False,
+            _name,
+            _placer: RectPlacer,
+            parent_idx,
+            rand_method: Literal["eps", "fit"],
+            return_bbox=False,
     ):
         # Put _name in _placer on parent_idx
 
@@ -375,13 +378,13 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
         ok = _placer.place_rectangle(_name, bbox=_bbox)
         if parent_idx == 0:
             _y_base = (
-                0 + prefabs[DEFAULT_FLOOR_PREFAB]["size"]["y"] / 2
+                    0 + prefabs[DEFAULT_FLOOR_PREFAB]["size"]["y"] / 2
             )  # center + size / 2
         else:
             parent_info = object_instances[parent_idx - len(floor_instances)]
             _y_base = (
-                parent_info["position"][1]
-                + prefabs[parent_info["prefab"]]["size"]["y"] / 2
+                    parent_info["position"][1]
+                    + prefabs[parent_info["prefab"]]["size"]["y"] / 2
             )
         if ok:
             _y = _y_base + _y_size / 2
@@ -404,11 +407,11 @@ def generate_scene_messy(object_counts: Dict[str, int] = {}):
         return ok
 
     def put_one(
-        _name,
-        _placer: RectPlacer,
-        parent_idx,
-        rand_method: Literal["eps", "fit"],
-        return_bbox=False,
+            _name,
+            _placer: RectPlacer,
+            parent_idx,
+            rand_method: Literal["eps", "fit"],
+            return_bbox=False,
     ):
         ok = False
         while not ok:
