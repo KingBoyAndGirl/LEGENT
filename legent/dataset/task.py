@@ -188,7 +188,7 @@ For example (The examples are from other scenes. The number means object_id):
         samples = []
         for task in task_lines:
             task, plan, solution = task.split('; ')
-            task, plan, solution = task.split(': ')[1], plan.split(': ')[1], solution.split(': ')[1]
+            task, plan, solution = task.split(': ')[1], plan.split(': ')[1], solution.split(': ')[1].split(', ')
             sample = {
                 "task": task,
                 "plan": plan,
