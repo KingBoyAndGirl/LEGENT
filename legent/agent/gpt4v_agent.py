@@ -7,7 +7,7 @@ from typing import List
 import numpy as np
 from legent.action.action import parse_action, Action
 from legent.utils.config import OPENAI_BASE_URL, OPENAI_API_KEY, MODEL_VISION_PREVIEW
-from legent.utils.io import log
+from legent.utils.io import log, save_image
 
 
 def encode_image_file(image_path):
@@ -76,7 +76,9 @@ class GPT4VAgentClient(AgentClient):
         return Action()
 
     def request_action(self, obs):
-        self.images_history.append(obs.image)
+        image = obs.image
+        self.images_history.append(image)
+        save_image(image, "agent_view.png")
 
         messages = encode_task(self.images_history[-6:], self.action_history[-5:],
                                self.prompt.format(self.current_chat))
