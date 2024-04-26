@@ -15,10 +15,11 @@ TASKS_FOLDER = f"{resource_path}/tasks"
 DATASET_FOLDER = f"{resource_path}/dataset"
 MODEL_FOLDER = f"{resource_path}/models"
 EVAL_FOLDER = f"{resource_path}/eval"
-ROOM_NUM = 2
+# Default number of scene rooms
+ROOM_NUM = None
 
 # OpenAI
-OPENAI_API_KEY = None
-OPENAI_BASE_URL = None
-MODEL_CHAT = 'gpt-4',  # 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k'
+OPENAI_API_KEY = 'EMPTY'
+OPENAI_BASE_URL = 'http://127.0.0.1:9999/v1/'
+MODEL_CHAT = 'chatglm3-6b' # 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k','chatglm3-6b'
 MODEL_VISION_PREVIEW = 'gpt-4-vision-preview'
