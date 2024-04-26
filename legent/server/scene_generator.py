@@ -3,6 +3,7 @@ import random
 from legent.environment.env_utils import get_default_env_data_path
 from legent.scene_generation.objects import get_default_object_db
 from legent.server.rect_placer import RectPlacer
+from legent.utils.config import ROOM_NUM
 from legent.utils.io import load_json, log, store_json, load_json_from_toolkit
 from legent.utils.math import look_rotation
 import numpy as np
@@ -70,7 +71,7 @@ def create_room_spec_sampler(room_list, room_num=0):
 
 
 def generate_scene(
-        object_counts: Dict[str, int] = {}, receptacle_object_counts={}, room_num=None, method="proc"
+        object_counts: Dict[str, int] = {}, receptacle_object_counts={}, room_num=ROOM_NUM, method="proc"
 ):
     if method == "proc":
         # object_counts specifies a definite number for certain objects
