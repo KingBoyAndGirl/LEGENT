@@ -2,6 +2,7 @@ import os
 import random
 import re
 import time
+import uuid
 from typing import Literal
 
 import numpy as np
@@ -160,12 +161,22 @@ class TaskCreator(ChatBase):
         # TODO: Add descriptions for functions goto_user(), goto(object_id), grab(), release().
         task_description = \
             f"""You need to {task_prompt['message']}
-You need to propose {sample_num} independent tasks and corresponding solutions, in the format of "Task: task; Plan: plan; Solution: solution.", with no line breaks between the three (use ';' to seperate). One sentence in Plan should match one function call in Solution.
+You need to propose {sample_num} independent tasks and corresponding solutions, in the format of "Task: task; Plan: plan; Solution: solution.", with no line breaks between the three (use ';' to seperate). 
+One sentence in Plan should match one function call in Solution, and the Solution should contain only the following instructions and no other irrelevant output:
+1. goto_user()
+2. find(Object) :Objects that need to be grasped
+3. goto(meters) :
+4. grab()
+5. speak()
 For example (The examples are from other scenes. The number means object_id):
 {task_prompt['example']}
 """
         content = f"{scene_description}\n{task_description}"
         messages = [
+            {
+                "role": "user",
+                "content": content
+            },
             {
                 "role": "system",
                 "content": system_message
@@ -174,15 +185,14 @@ For example (The examples are from other scenes. The number means object_id):
                 "role": "assistant",
                 "content": task_prompt['example']
             },
-            {
-                "role": "user",
-                "content": content
-            },
         ]
+        id = uuid.uuid4()
+        log_green(f"\nid:{id} start send chat...")
 
         ret = self.send_chat(messages)
 
         log_green(f"<g>Send to ChatGPT<g/>:\n{content}\n<g>Received from ChatGPT<g/>:\n{ret}")
+        log_green(f"\nid:{id} end send chat...")
 
         task_lines = [task for task in ret.split("\n") if task]
         samples = []
